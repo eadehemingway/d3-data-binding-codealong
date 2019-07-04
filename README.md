@@ -255,3 +255,20 @@ decreaseButton.addEventListener('click', () => {
   updateLiquid(newData);
 });
 ```
+
+this now updates the liquid but does so without a smooth transition.
+add transition() and duration() to updateLiquid func so it looks like this:
+
+```js
+const updateLiquid = newData => {
+  vaseGroups.data(newData);
+  vaseGroups
+    .select('rect.liquid')
+    .transition()
+    .duration(750)
+    .attr('height', d => d.liquidHeight)
+    .attr('y', d => vaseY - d.liquidHeight);
+};
+```
+
+now it should all work!!

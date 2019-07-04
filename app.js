@@ -51,7 +51,7 @@ const updateLiquid = newData => {
   vaseGroups
     .select('rect.liquid')
     .transition()
-    .duration(1500)
+    .duration(750)
     .attr('height', d => d.liquidHeight)
     .attr('y', d => vaseY - d.liquidHeight);
 };
