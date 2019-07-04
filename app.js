@@ -7,30 +7,32 @@ let data = [
   { id: 6, height: 20, liquidHeight: 5, color: '#9980FA' }
 ];
 
+const svgWidth = 700;
+const svgHeight = 500;
 const svg = d3
   .select('#chart')
   .append('svg')
-  .attr('width', 700)
-  .attr('height', 500);
-
-const vaseY = 300;
-const vaseWidth = 15;
-const margin = 230;
-const padding = 60;
+  .attr('width', svgWidth)
+  .attr('height', svgHeight);
 
 const vaseGroups = svg
-  .selectAll('g.vase')
+  .selectAll('g')
   .data(data)
   .enter()
   .append('g')
   .attr('class', 'vase');
+
+const margin = 230;
+const padding = 60;
+const vaseWidth = 15;
+const vaseY = 300;
 
 vaseGroups
   .append('rect')
   .attr('class', 'vase')
   .attr('width', vaseWidth)
   .attr('height', d => d.height)
-  .attr('x', (d, i) => i * padding + margin)
+  .attr('x', (_, i) => i * padding + margin)
   .attr('y', d => vaseY - d.height)
   .attr('fill', 'none')
   .attr('stroke', d => d.color);
@@ -42,10 +44,11 @@ vaseGroups
   .attr('height', d => d.liquidHeight)
   .attr('x', (_, i) => i * padding + margin)
   .attr('y', d => vaseY - d.liquidHeight)
-  .attr('fill', d => d.color)
-  .attr('stroke', d => d.color);
+  .attr('fill', d => d.color);
 
-const updateLiquid = () => {
+const updateLiquid = newData => {
+  vaseGroups.data(newData);
+
   vaseGroups
     .select('rect.liquid')
     .transition()
@@ -55,8 +58,7 @@ const updateLiquid = () => {
     .attr('y', d => vaseY - d.liquidHeight);
 };
 
-updateLiquid();
-///////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
 
 const increaseButton = document.querySelector('#increase');
 increaseButton.addEventListener('click', () => {
@@ -66,19 +68,20 @@ increaseButton.addEventListener('click', () => {
     return { ...d, liquidHeight: newLiquidHeight };
   });
   data = newData;
-  vaseGroups.data(newData);
-  updateLiquid();
+  updateLiquid(newData);
 });
 
 const decreaseButton = document.querySelector('#decrease');
 decreaseButton.addEventListener('click', () => {
   const newData = data.map(d => {
     const minusTen = d.liquidHeight - 10;
+    console.log(minusTen);
     const newLiquidHeight = minusTen > 0 ? minusTen : 0;
+    console.log(newLiquidHeight);
     return { ...d, liquidHeight: newLiquidHeight };
   });
 
   data = newData;
-  vaseGroups.data(newData);
-  updateLiquid();
+  console.log(newData);
+  updateLiquid(newData);
 });
