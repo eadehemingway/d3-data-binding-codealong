@@ -48,12 +48,10 @@ vaseGroups
 
 const updateLiquid = newData => {
   vaseGroups.data(newData);
-
   vaseGroups
     .select('rect.liquid')
     .transition()
     .duration(1500)
-    .ease(d3.easeElasticOut)
     .attr('height', d => d.liquidHeight)
     .attr('y', d => vaseY - d.liquidHeight);
 };
@@ -75,13 +73,10 @@ const decreaseButton = document.querySelector('#decrease');
 decreaseButton.addEventListener('click', () => {
   const newData = data.map(d => {
     const minusTen = d.liquidHeight - 10;
-    console.log(minusTen);
     const newLiquidHeight = minusTen > 0 ? minusTen : 0;
-    console.log(newLiquidHeight);
     return { ...d, liquidHeight: newLiquidHeight };
   });
 
   data = newData;
-  console.log(newData);
   updateLiquid(newData);
 });
