@@ -1,5 +1,7 @@
 # D3 workshop
 
+![](./vase-gif.gif)
+
 ### code along
 
 #### step one - add svg
