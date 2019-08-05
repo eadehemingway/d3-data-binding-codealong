@@ -50,8 +50,7 @@ const vaseGroups = svg
   .selectAll('g')
   .data(data)
   .enter()
-  .append('g')
-  .attr('class', 'vase');
+  .append('g');
 
 console.log(vaseGroups);
 ```
@@ -70,23 +69,26 @@ const padding = 60;
 const vaseWidth = 15;
 const vaseY = 300;
 
-const vaseGroups = svg
+svg
   .selectAll('g')
   .data(data)
   .enter()
   .append('g')
-  .attr('class', 'vase')
   .append('rect')
   .attr('class', 'vase')
   .attr('width', vaseWidth)
   .attr('height', d => d.height)
   .attr('x', (_, i) => i * padding + margin)
-  .attr('y', d => vaseY - d.height)
+  .attr('y', d => vaseY)
   .attr('fill', 'none')
   .attr('stroke', d => d.color);
 ```
 
-so this adds rectangles to each group, and uses the data bound to the group to determine the height and colour.
+so this adds rectangles to each group, and uses the data bound to the group to determine the height and colour. the vases are all upsidedown now, so we need to change the y value to:
+
+```js
+  .attr('y', d => vaseY - d.height)
+```
 
 #### step 4 - add liquid rects
 
@@ -95,7 +97,7 @@ we now need to add another rectange to each group to present the liquid in the v
 this time we dont need to bind the data to the group elements because it is already bound, and we dont need to enter any elements because there are already the right amount on the page. so we can just select all groups and add the rects
 
 ```js
-const liquid = svg
+svg
   .selectAll('g')
   .append('rect')
   .attr('class', 'liquid')
@@ -105,6 +107,8 @@ const liquid = svg
   .attr('y', d => vaseY - d.liquidHeight)
   .attr('fill', d => d.color);
 ```
+
+#### step 5 - refactor
 
 note that
 `svg.selectAll('g')` when there are 6 'g' on the page will return the same thing as
@@ -119,43 +123,34 @@ svg
 
 when there are 6 items in data. They both return a selection of 6 group elements. the first will be nodelist and the second an array but in practice they are the same thing (a selection of 6 group elements)
 
-console log them both to show this.
-
-#### step 5 - refactor
-
-if we separate the code well, into useful variables it avoids repetition so lets refactor this to:
+so we can use the variable vaseGroups instead of `selectAll('g')`
 
 ```js
-const vaseGroups = svg
-  .selectAll('g')
-  .data(data)
-  .enter()
-  .append('g')
-  .attr('class', 'vase');
+vaseGroups
+  .append('rect')
+  .attr('class', 'vase')...
 
 vaseGroups
   .append('rect')
-  .attr('class', 'vase')
-  .attr('width', vaseWidth)
-  .attr('height', d => d.height)
-  .attr('x', (_, i) => i * padding + margin)
-  .attr('y', d => vaseY - d.height)
-  .attr('fill', 'none')
-  .attr('stroke', d => d.color);
-
-vaseGroups
-  .append('rect')
-  .attr('class', 'liquid')
-  .attr('width', vaseWidth)
-  .attr('height', d => d.liquidHeight)
-  .attr('x', (_, i) => i * padding + margin)
-  .attr('y', d => vaseY - d.liquidHeight)
-  .attr('fill', d => d.color);
+  .attr('class', 'liquid')..
 ```
 
 #### step 6 - add event listeners for buttons
 
 add eventlistener for increase button that updates the data
+
+```js
+const increaseButton = document.querySelector('#increase');
+increaseButton.addEventListener('click', () => {
+  const newData = data.map(d => {
+    const plusTen = d.liquidHeight + 10;
+    return { ...d, liquidHeight: plusTen };
+  });
+  data = newData;
+});
+```
+
+but now it keeps going even when the vase is full!
 
 ```js
 const increaseButton = document.querySelector('#increase');
@@ -197,8 +192,8 @@ increaseButton.addEventListener('click', () => {
     return { ...d, liquidHeight: newLiquidHeight };
   });
   data = newData;
-  vaseGroups.data(newData);
   vaseGroups
+    .data(newData)
     .select('rect.liquid')
     .attr('height', d => d.liquidHeight)
     .attr('y', d => vaseY - d.liquidHeight);
@@ -213,8 +208,8 @@ decreaseButton.addEventListener('click', () => {
   });
 
   data = newData;
-  vaseGroups.data(newData);
   vaseGroups
+    .data(newData)
     .select('rect.liquid')
     .attr('height', d => d.liquidHeight)
     .attr('y', d => vaseY - d.liquidHeight);
@@ -227,8 +222,8 @@ we can see that we have some duplication in the eventlisteners so lets abstract 
 
 ```js
 const updateLiquid = newData => {
-  vaseGroups.data(newData);
   vaseGroups
+    .data(newData)
     .select('rect.liquid')
     .attr('height', d => d.liquidHeight)
     .attr('y', d => vaseY - d.liquidHeight);
@@ -263,8 +258,8 @@ add transition() and duration() to updateLiquid func so it looks like this:
 
 ```js
 const updateLiquid = newData => {
-  vaseGroups.data(newData);
   vaseGroups
+    .data(newData)
     .select('rect.liquid')
     .transition()
     .duration(750)

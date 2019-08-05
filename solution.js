@@ -20,7 +20,6 @@ const vaseGroups = svg
   .data(data)
   .enter()
   .append('g')
-  .attr('class', 'vase');
 
 const margin = 230;
 const padding = 60;
